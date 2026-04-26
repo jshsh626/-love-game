@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你喜欢我吗</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            width: 100vw;
+            height: 100vh;
+            background-color: #ffd6e0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: sans-serif;
+        }
+        .title {
+            font-size: 34px;
+            color: #ff3366;
+            margin-bottom: 50px;
+            font-weight: bold;
+        }
+        .btn-wrap {
+            display: flex;
+            gap: 30px;
+            position: relative;
+        }
+        button {
+            padding: 10px 22px;
+            font-size: 18px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+        }
+        .yes {
+            background: #ff3366;
+            color: #fff;
+        }
+        .no {
+            background: #eee;
+            color: #666;
+            position: absolute;
+            transition: all 0.1s;
+        }
+        .heart {
+            position: fixed;
+            top: -10px;
+            color: #ff3366;
+            font-size: 20px;
+            pointer-events: none;
+            animation: fall linear forwards;
+        }
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">你喜欢我吗</div>
+    <div class="btn-wrap">
+        <button class="yes">喜欢</button>
+        <button class="no">不喜欢</button>
+    </div>
+
+<script>
+    // 爱心飘落效果
+    function createHeart(){
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = '❤️';
+        heart.style.left = Math.random() * 100 + 'vw';
+        heart.style.animationDuration = Math.random() * 3 + 2 + 's';
+        document.body.appendChild(heart);
+        setTimeout(()=>heart.remove(), 5000);
+    }
+    setInterval(createHeart, 300);
+
+    // 按钮乱跑+缩小
+    let yesBtn = document.querySelector('.yes')
+    let noBtn = document.querySelector('.no')
+    let scale = 1
+
+    noBtn.addEventListener('mouseover', moveBtn)
+    noBtn.addEventListener('click', moveBtn)
+
+    function moveBtn(){
+        let w = window.innerWidth - noBtn.offsetWidth
+        let h = window.innerHeight - noBtn.offsetHeight
+        let x = Math.random() * w
+        let y = Math.random() * h
+        noBtn.style.left = x + 'px'
+        noBtn.style.top = y + 'px'
+        scale -= 0.1
+        if(scale < 0.1) scale = 0.1
+        noBtn.style.transform = `scale(${scale})`
+    }
+
+    // 点击喜欢显示情话
+    yesBtn.onclick = function(){
+        document.body.innerHTML = `
+        <div style="font-size:40px;color:#ff3366;text-align:center;padding:20px;">
+            宝宝爱你哦😘
+        </div>
+        `
+    }
+</script>
+</body>
+</html>
