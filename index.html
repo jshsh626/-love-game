@@ -18,101 +18,109 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            font-family: "Microsoft YaHei", sans-serif;
             overflow: hidden;
-            font-family: sans-serif;
         }
         .title {
-            font-size: 34px;
-            color: #ff3366;
-            margin-bottom: 50px;
+            font-size: 26px;
+            color: #ff4081;
+            margin-bottom: 40px;
             font-weight: bold;
         }
         .btn-wrap {
-            display: flex;
-            gap: 30px;
             position: relative;
         }
         button {
-            padding: 10px 22px;
-            font-size: 18px;
+            padding: 14px 30px;
             border: none;
             border-radius: 30px;
+            font-size: 17px;
             cursor: pointer;
+            transition: all 0.15s ease;
         }
-        .yes {
-            background: #ff3366;
+        #btn-yes {
+            background-color: #ff4081;
             color: #fff;
+            z-index: 99;
         }
-        .no {
-            background: #eee;
-            color: #666;
+        #btn-no {
+            background: #eeeeee;
+            color: #555;
             position: absolute;
-            transition: all 0.1s;
+            left: 120px;
+            top: 0;
         }
-        .heart {
-            position: fixed;
-            top: -10px;
-            color: #ff3366;
-            font-size: 20px;
-            pointer-events: none;
-            animation: fall linear forwards;
-        }
-        @keyframes fall {
-            to {
-                transform: translateY(100vh) rotate(360deg);
-                opacity: 0;
-            }
+        .result {
+            margin-top: 40px;
+            font-size: 22px;
+            color: #ff4081;
+            font-weight: bold;
+            display: none;
         }
     </style>
 </head>
 <body>
     <div class="title">你喜欢我吗</div>
     <div class="btn-wrap">
-        <button class="yes">喜欢</button>
-        <button class="no">不喜欢</button>
+        <button id="btn-yes">喜欢</button>
+        <button id="btn-no">不喜欢</button>
     </div>
+    <div class="result" id="result-text"></div>
 
-<script>
-    // 爱心飘落效果
-    function createHeart(){
-        const heart = document.createElement('div');
-        heart.classList.add('heart');
-        heart.innerHTML = '❤️';
-        heart.style.left = Math.random() * 100 + 'vw';
-        heart.style.animationDuration = Math.random() * 3 + 2 + 's';
-        document.body.appendChild(heart);
-        setTimeout(()=>heart.remove(), 5000);
-    }
-    setInterval(createHeart, 300);
+    <script>
+        const btnNo = document.getElementById('btn-no');
+        const btnYes = document.getElementById('btn-yes');
+        const resultText = document.getElementById('result-text');
 
-    // 按钮乱跑+缩小
-    let yesBtn = document.querySelector('.yes')
-    let noBtn = document.querySelector('.no')
-    let scale = 1
+        // 可爱乱跑音效
+        const jumpSound = new Audio("https://www.soundjay.com/button/swoop-1.mp3");
+        jumpSound.volume = 0.3;
 
-    noBtn.addEventListener('mouseover', moveBtn)
-    noBtn.addEventListener('click', moveBtn)
+        // 喜欢成功音效
+        const loveSound = new Audio("https://www.soundjay.com/button/bell-1.mp3");
+        loveSound.volume = 0.3;
 
-    function moveBtn(){
-        let w = window.innerWidth - noBtn.offsetWidth
-        let h = window.innerHeight - noBtn.offsetHeight
-        let x = Math.random() * w
-        let y = Math.random() * h
-        noBtn.style.left = x + 'px'
-        noBtn.style.top = y + 'px'
-        scale -= 0.1
-        if(scale < 0.1) scale = 0.1
-        noBtn.style.transform = `scale(${scale})`
-    }
+        // 不喜欢按钮：乱跑 + 不重叠 + 缩小 + 音效
+        btnNo.addEventListener('mouseenter', function(){
+            jumpSound.cloneNode(true).play();
 
-    // 点击喜欢显示情话
-    yesBtn.onclick = function(){
-        document.body.innerHTML = `
-        <div style="font-size:40px;color:#ff3366;text-align:center;padding:20px;">
-            宝宝爱你哦😘
-        </div>
-        `
-    }
-</script>
+            let x, y, ok = false;
+            const yesBox = btnYes.getBoundingClientRect();
+            const noBox = btnNo.getBoundingClientRect();
+
+            // 循环找不重叠的位置
+            while(!ok){
+                x = Math.random() * (window.innerWidth - 120);
+                y = Math.random() * (window.innerHeight - 120);
+
+                let farX = Math.abs(x - yesBox.left);
+                let farY = Math.abs(y - yesBox.top);
+                // 距离够远才合格，绝不重叠
+                if(farX > 130 || farY > 80){
+                    ok = true;
+                }
+            }
+
+            btnNo.style.left = x + "px";
+            btnNo.style.top = y + "px";
+
+            // 越来越小
+            let scale = getComputedStyle(btnNo).transform;
+            if(scale === "none") scale = 1;
+            else {
+                let mat = new DOMMatrix(scale);
+                scale = mat.a;
+            }
+            btnNo.style.transform = `scale(${scale * 0.88})`;
+        })
+
+        // 点喜欢 弹窗情话+音效
+        btnYes.addEventListener('click', function(){
+            loveSound.play();
+            resultText.innerText = "我也超级喜欢你❤️";
+            resultText.style.display = "block";
+            document.body.style.background = "#ffc8dd";
+        })
+    </script>
 </body>
 </html>
